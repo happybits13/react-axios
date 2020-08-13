@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../axios';
 import './NewPost.css';
+
+import {Redirect} from 'react-router-dom';
 
 class NewPost extends Component {
     state = {
         title: '',
         content: '',
-        author: 'Max'
+        author: 'Max',
+        submitted: false
     }
 
     postDataHandler = () => {
@@ -17,16 +20,28 @@ class NewPost extends Component {
         }
 
         // takes in 3 arguments. 1st: server to http post. 2nd: data to post. 3rd is optional, conversoin of data to compatible format
-        // axios converted the object format(postData) to string format for http post req
-        axios.post('/posts', postData)
+        // axios converted the object format(postData) to string format for http post req. response is returned in .then()
+        axiosInstance.post('/posts', postData)
             .then(response => {
                 console.log(response);
+                // redirects to posts and replace history to /posts. Alternative to using redirect component to moving to next page
+                //this.props.history.replace('/posts');
+                // redirects to /post. another alternative to using redirect component to moving to next page
+                //this.props.history.push('/posts');
+                this.setState({submitted: true});
             });
     }
 
     render () {
+        //  
+        let redirect = null;
+
+        if(this.state.submitted)
+            redirect = <Redirect to="/posts"></Redirect>
+
         return (
             <div className="NewPost">
+                {redirect}
                 <h1>Add a Post</h1>
                 <label>Title</label>
                 <input type="text" value={this.state.title} onChange={(event) => this.setState({title: event.target.value})} />
